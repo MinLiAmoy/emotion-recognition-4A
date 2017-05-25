@@ -39,6 +39,8 @@ def format_image(image):
     return None
   # cv2.imshow("Lol", image)
   # cv2.waitKey(0)
+  for (x,y,w,h) in faces:
+    cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 2)
   return image
 
 # Load Model
@@ -60,7 +62,7 @@ while True:
   result = network.predict(format_image(frame))
 
   # Draw face in frame
-  # for (x,y,w,h) in faces:
+  # for (x,y,w,h) in face:
   #   cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 2)
 
   # Write results in frame

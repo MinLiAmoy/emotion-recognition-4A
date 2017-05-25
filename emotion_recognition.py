@@ -77,11 +77,8 @@ class EmotionRecognition:
     print('[+] Model trained and saved at ' + SAVE_MODEL_FILENAME)
 
   def load_model(self):
-    if isfile(join(SAVE_DIRECTORY, SAVE_MODEL_FILENAME)):
-      self.model.load(join(SAVE_DIRECTORY, SAVE_MODEL_FILENAME))
-      print('[+] Model loaded from ' + SAVE_MODEL_FILENAME)
-    else:
-      print ('no model found!!!')
+    self.model.load(join(SAVE_DIRECTORY, SAVE_MODEL_FILENAME))
+    print('[+] Model loaded from ' + SAVE_MODEL_FILENAME)
 
 
 def show_usage():
