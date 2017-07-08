@@ -4,6 +4,13 @@ import sys
 from constants import *
 from emotion_recognition import EmotionRecognition
 import numpy as np
+import serial
+
+ser = serial.Serial()
+ser.baudrate = 9600
+ser.port = 'COM4'
+ser.close()
+ser.open()
 
 cascade_classifier = cv2.CascadeClassifier(CASC_PATH)
 
@@ -39,8 +46,6 @@ def format_image(image):
     return None
   # cv2.imshow("Lol", image)
   # cv2.waitKey(0)
-  for (x,y,w,h) in faces:
-    cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 2)
   return image
 
 # Load Model
@@ -53,20 +58,39 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 feelings_faces = []
 for index, emotion in enumerate(EMOTIONS):
   feelings_faces.append(cv2.imread('./emojis/' + emotion + '.png', -1))
-
+i = 1
+flag = True
 while True:
   # Capture frame-by-frame
   ret, frame = video_capture.read()
 
   # Predict result with network
   result = network.predict(format_image(frame))
-
+  print(result)
   # Draw face in frame
-  # for (x,y,w,h) in face:
+  # for (x,y,w,h) in faces:
   #   cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 2)
 
   # Write results in frame
   if result is not None:
+    # whenever there is an emoji, tag it 
+    pro = max(result[0])
+    place = (result[0]).index(pro)
+    tag = EMOTIONS[place]
+    print(tag)
+    # wirte the tag to TXT
+    with open("emoji.txt","w") as f:
+      if tag is 'happy':
+        i = i+1
+        if i==10:
+          if flag == True:
+            ser.write('ONA\n'.encode())
+            flag = False
+          else:
+            ser.write('ONF\n'.encode())
+            flag = True
+      else:
+        i = 0
     for index, emotion in enumerate(EMOTIONS):
       cv2.putText(frame, emotion, (10, index * 20 + 20), cv2.FONT_HERSHEY_PLAIN, 0.5, (0, 255, 0), 1);
       cv2.rectangle(frame, (130, index * 20 + 10), (130 + int(result[0][index] * 100), (index + 1) * 20 + 4), (255, 0, 0), -1)
@@ -79,7 +103,7 @@ while True:
 
 
   # Display the resulting frame
-  cv2.imshow('Video', frame)
+    cv2.imshow('Video', frame)
 
   if cv2.waitKey(1) & 0xFF == ord('q'):
     break
